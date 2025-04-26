@@ -14,4 +14,5 @@ alacritty migrate 2>/dev/null || true
 alacritty migrate -c ~/.config/alacritty/pane.toml 2>/dev/null || true
 alacritty migrate -c ~/.config/alacritty/btop.toml 2>/dev/null || true
 
-source ~/.local/share/omakub/install/desktop/set-alacritty-default.sh
+# Make alacritty default terminal emulator
+sudo update-alternatives --set x-terminal-emulator /usr/bin/alacritty

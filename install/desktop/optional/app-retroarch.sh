@@ -1,1 +1,1 @@
-flatpak install -y flathub org.libretro.RetroArch
+flatpak install --user -y flathub org.libretro.RetroArch
