@@ -14,6 +14,7 @@ CHOICES=(
   "Spotify           Stream music from the world's most popular service"
   "Steam             Play games from Valve's store"
   "VirtualBox        Virtual machines to run Windows/Linux"
+  "VirtualBox-7.1    Virtual machines to run Windows/Linux v7.1.x"
   "Zoom              Attend and host video chat meetings"
   "> All             Re-run any of the default installers"
   "<< Back           "
