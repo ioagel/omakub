@@ -1,10 +1,11 @@
 CHOICES=(
-  "Cursor            AI Code Editor"
-  "Doom Emacs        Emacs framework with curated list of packages"
-  "RubyMine          IntelliJ's commercial Ruby editor"
-  "Windsurf          Another AI Code Editor"
-  "Zed               Fast all-purpose editor"
-  "<< Back           "
+  "Cursor             AI Code Editor"
+  "Doom Emacs         Emacs framework with curated list of packages"
+  "RubyMine           IntelliJ's commercial Ruby editor"
+  "JetBrains Toolbox  Install JetBrains IDEs"
+  "Windsurf           Another AI Code Editor"
+  "Zed                Fast all-purpose editor"
+  "<< Back            "
 )
 
 CHOICE=$(gum choose "${CHOICES[@]}" --height 8 --header "Install editor")
