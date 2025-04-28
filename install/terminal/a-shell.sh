@@ -8,3 +8,6 @@ source ~/.local/share/omakub/defaults/bash/shell
 [ -f "~/.inputrc" ] && mv ~/.inputrc ~/.inputrc.bak
 # Configure the inputrc using Omakub defaults
 cp ~/.local/share/omakub/configs/inputrc ~/.inputrc
+
+# Install our scripts
+cp ~/.local/share/omakub/defaults/bin/* ~/.local/bin/

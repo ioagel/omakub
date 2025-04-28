@@ -1,0 +1,13 @@
+# No arguments: `git status`
+# With arguments: acts like `git`
+
+# conflict with oh-my-zsh 'git' plugin
+unalias g > /dev/null 2>&1
+
+g() {
+  if [[ $# -gt 0 ]]; then
+    git "$@"
+  else
+    git status
+  fi
+}
