@@ -2,6 +2,8 @@ CHOICES=(
   "Dev Editor        Install alternative programming editors"
   "Dev Language      Install programming language environment"
   "Dev Database      Install development database in Docker"
+  "Zsh               Install zsh with oh-my-zsh and starship prompt"
+  "Keyd              Remap CAPS LOCK to ESC (tap) & CTRL (hold)"
   "1password         Manage your passwords securely across devices"
   "Audacity          Record and edit audio"
   "ASDControl        Set brightness on Apple Studio and XDR displays"
@@ -39,6 +41,8 @@ else
   "dev-editor") INSTALLER_FILE="$OMAKUB_PATH/bin/omakub-sub/install-dev-editor.sh" ;;
   "dev-language") INSTALLER_FILE="$OMAKUB_PATH/install/terminal/select-dev-language.sh" ;;
   "dev-database") INSTALLER_FILE="$OMAKUB_PATH/install/terminal/select-dev-storage.sh" ;;
+  "zsh") INSTALLER_FILE="$OMAKUB_PATH/install/terminal/optional/zsh.sh" ;;
+  "keyd") INSTALLER_FILE="$OMAKUB_PATH/install/terminal/optional/service-keyd.sh" ;;
   "ollama") INSTALLER_FILE="$OMAKUB_PATH/install/terminal/optional/app-ollama.sh" ;;
   *) INSTALLER_FILE="$OMAKUB_PATH/install/desktop/optional/app-$INSTALLER.sh" ;;
   esac

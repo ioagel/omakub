@@ -1,0 +1,9 @@
+# FileSearch
+
+# fs: Find files/dirs by name (case-insensitive) containing $1, passing further args to find.
+# Example: fs config -type f (find only files not directories)
+function fs() { find . -iname "*$1*" ${@:2} }
+
+# cs: Grep recursively for pattern $1 (case-sensitive), passing further args to grep.
+# Example: cs my_variable -i -n (this is case insensitive and shows line numbers)
+function cs() { grep "$1" ${@:2} -R . }

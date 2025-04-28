@@ -1,0 +1,71 @@
+# Credits to: Thoughtbot dotfiles https://github.com/thoughtbot/dotfiles for initial implementation
+# extra files in ~/.zsh/configs/pre , ~/.zsh/configs , and ~/.zsh/configs/post
+# these are loaded first, second, and third, respectively.
+_load_settings() {
+    local _dir="$1"
+    local config
+
+    if [ ! -d "$_dir" ]; then
+        return 1 # Exit if base directory doesn't exist
+    fi
+
+    # Ensure necessary Zsh options are set locally for this function
+    setopt local_options nullglob extendedglob
+
+    # Process 'pre' directory
+    if [ -d "$_dir/pre" ]; then
+        # Glob for all regular files recursively, sorted by name
+        for config in "$_dir"/pre/**/*(N-.); do
+            # Skip .zwc files inside the loop
+            if [[ "$config" == *.zwc ]]; then
+                continue
+            fi
+            # Source the config file
+            . "$config"
+        done
+    fi
+
+    # Process main directory (excluding pre/post subdirectories)
+    # Glob for all regular files recursively, sorted by name
+    for config in "$_dir"/**/*(N-.); do
+        # Skip files within pre/post directories and .zwc files
+        if [[ "$config" == "$_dir"/pre/* || "$config" == "$_dir"/post/* || "$config" == *.zwc ]]; then
+            continue
+        fi
+        # Source the config file
+        . "$config"
+    done
+
+    # Process 'post' directory
+    if [ -d "$_dir/post" ]; then
+        # Glob for all regular files recursively, sorted by name
+        for config in "$_dir"/post/**/*(N-.); do
+            # Skip .zwc files inside the loop
+            if [[ "$config" == *.zwc ]]; then
+                continue
+            fi
+            # Source the config file
+            . "$config"
+        done
+    fi
+
+    # local_options automatically restores options on function exit
+}
+_load_settings "$HOME/.local/share/omakub/defaults/zsh/configs"
+
+# load custom executable functions
+for function in $HOME/.local/share/omakub/defaults/zsh/functions/*; do
+    source $function
+done
+
+# Load starship here, because when doing it as a oh-my-zsh plugin, it breaks the _load_settings function
+# The "post" directory contents are not loaded when doing it as a oh-my-zsh plugin
+eval "$(starship init zsh)"
+
+source ~/.local/share/omakub/defaults/aliases
+
+# Provide local customizations
+[ -f ~/.zshrc.local ] && source ~/.zshrc.local
+
+# Provide local aliases customizations
+[ -f ~/.aliases ] && source ~/.aliases

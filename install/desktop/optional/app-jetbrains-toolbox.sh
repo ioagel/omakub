@@ -10,8 +10,8 @@ JSON_DATA=$(curl -sL "$API_URL")
 
 # Check if curl succeeded and got some data
 if [ -z "$JSON_DATA" ]; then
-    echo "Error: Failed to fetch data from API_URL."
-    exit 1
+  echo "Error: Failed to fetch data from API_URL."
+  exit 1
 fi
 
 # Extract Build Number (using printf to pipe variable content)
@@ -52,16 +52,16 @@ if [ -f "$FILENAME" ]; then
     echo "Verifying checksum..."
     # Check if checksum file downloaded successfully before verifying
     if [ -f "${FILENAME}.sha256" ]; then
-        sha256sum -c "${FILENAME}.sha256"
+      sha256sum -c "${FILENAME}.sha256"
     else
-        echo "Warning: Failed to download checksum file."
+      echo "Warning: Failed to download checksum file."
     fi
   fi
   echo "Extracting..."
   mkdir -p /tmp/jetbrains-Toolbox
   tar -xzf "$FILENAME" -C /tmp/jetbrains-Toolbox --strip-components=1
   # run the app
-  /tmp/jetbrains-Toolbox/jetbrains-toolbox
+  /tmp/jetbrains-Toolbox/jetbrains-toolbox --minimize
   sleep 5
   killall jetbrains-toolbox
 else
@@ -69,4 +69,4 @@ else
   exit 1
 fi
 
-echo "JetBrains Toolbox download and verification complete."
+echo "JetBrains Toolbox installation complete."

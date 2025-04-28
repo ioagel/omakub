@@ -1,6 +1,4 @@
 # File system
-alias ls='eza -lh --group-directories-first --icons=auto'
-alias lsa='ls -a'
 alias lt='eza --tree --level=2 --long --icons --git'
 alias lta='lt -a'
 alias ff="fzf --preview 'batcat --style=numbers --color=always {}'"
@@ -11,20 +9,17 @@ alias cd='z'
 alias ..='cd ..'
 alias ...='cd ../..'
 alias ....='cd ../../..'
+# Pretty print the path
+alias path='echo $PATH | tr -s ":" "\n"'
 
 # Tools
+alias vim='nvim'
 alias n='nvim'
-alias g='git'
 alias d='docker'
 alias r='rails'
 alias bat='batcat'
 alias lzg='lazygit'
 alias lzd='lazydocker'
-
-# Git
-alias gcm='git commit -m'
-alias gcam='git commit -a -m'
-alias gcad='git commit -a --amend'
 
 # Compression
 compress() { tar -czf "${1%/}.tar.gz" "${1%/}"; }
@@ -58,3 +53,23 @@ alias fix_spotify_window_size="sudo sed -i 's|^Exec=.*|Exec=spotify --force-devi
 
 # Install flatpaks for user
 alias fpinstall='flatpak install --user -y'
+
+# Conditionally set aliases based on the shell
+if [[ "$SHELL" =~ "bash" ]]; then
+  # File system
+  alias ls='eza -lh --group-directories-first --icons=auto'
+  alias lsa='ls -a'
+
+  # Tools
+  alias g='git'
+
+  # Git
+  alias gcm='git commit -m'
+  alias gcam='git commit -a -m'
+  alias gcad='git commit -a --amend'
+
+else
+  # In Zsh we have oh-my-zsh which has its own aliases
+  alias ll='eza -lh --group-directories-first --icons=auto'
+  alias l='eza -lh --group-directories-first --icons=auto -a'
+fi
