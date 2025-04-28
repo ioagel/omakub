@@ -1,0 +1,151 @@
+#!/usr/bin/env python3
+"""
+Finds files containing a literal string using 'rg' (ripgrep) or 'ag'
+(The Silver Searcher) and replaces all occurrences of that literal string
+with a replacement string within those files.
+
+Usage:
+  replace 'find_string' 'replace_string' file_pattern [file_pattern...]
+
+Arguments:
+  find_string: The literal string to search for in files.
+  replace_string: The literal string to replace occurrences with.
+  file_pattern: One or more glob patterns or file paths passed to rg/ag
+                to specify which files/directories to search within.
+
+Behavior:
+- Uses 'rg' if available, otherwise falls back to 'ag'. Exits if neither is found.
+- Performs a literal (fixed string) search for files containing 'find_string'.
+- Performs a literal replacement of 'find_string' with 'replace_string'.
+- Only modifies files where the content actually changes.
+- Uses temporary files and atomic replace (os.replace) for safer in-place editing.
+- Preserves original file permissions.
+- Assumes files are UTF-8 encoded.
+- Reports summary and exits with non-zero status if errors occur.
+"""
+
+import sys
+import subprocess
+import os
+import shutil
+import tempfile
+from pathlib import Path
+
+def find_tool():
+    """Finds the best available file search tool (rg or ag)."""
+    if shutil.which("rg"):
+        return ["rg", "--files-with-matches", "--color=never", "--fixed-strings", "--"]
+    elif shutil.which("ag"):
+        return ["ag", "-l", "--nocolor", "--literal", "--"]
+    else:
+        return None
+
+def main():
+    # --- Input Validation ---
+    if len(sys.argv) < 4:
+        script_name = os.path.basename(sys.argv[0])
+        print(f"Usage: {script_name} 'find_string' 'replace_string' file_pattern [file_pattern...]", file=sys.stderr)
+        sys.exit(1)
+
+    find_this = sys.argv[1]
+    replace_with = sys.argv[2]
+    file_patterns = sys.argv[3:] # These are treated by rg/ag directly
+
+    # --- Find files ---
+    tool_cmd = find_tool()
+    if not tool_cmd:
+        print("Error: 'rg' (ripgrep) or 'ag' (The Silver Searcher) not found.", file=sys.stderr)
+        sys.exit(1)
+
+    find_cmd = tool_cmd + [find_this] + file_patterns
+    try:
+        process = subprocess.run(find_cmd, capture_output=True, text=True, check=False)
+        # Don't check=True, as no matches might return non-zero
+        if process.returncode > 1: # rg/ag return 0 for match, 1 for no match, >1 for error
+             print(f"Error running file search tool: {process.stderr}", file=sys.stderr)
+             sys.exit(process.returncode)
+        found_items = process.stdout.strip().split('\n')
+        # Filter out empty lines if any
+        found_items = [item for item in found_items if item]
+
+    except FileNotFoundError:
+         print(f"Error: Failed to execute command {' '.join(find_cmd)}. Is the tool installed?", file=sys.stderr)
+         sys.exit(1)
+    except Exception as e:
+         print(f"An unexpected error occurred while searching for files: {e}", file=sys.stderr)
+         sys.exit(1)
+
+
+    # Check if any files were found
+    if not found_items:
+        print(f"No files found containing '{find_this}' matching the given patterns.")
+        sys.exit(0)
+
+    # --- Perform Replacement ---
+    replaced_count = 0
+    error_count = 0
+    processed_count = 0
+
+    print(f"Processing {len(found_items)} files containing '{find_this}'...")
+
+    for item_path_str in found_items:
+        item_path = Path(item_path_str)
+        processed_count += 1
+        temp_file_path = None # Ensure it's defined for finally block
+
+        try:
+            # Read the file content
+            original_content = item_path.read_text(encoding='utf-8') # Assume UTF-8
+
+            # Perform literal replacement
+            new_content = original_content.replace(find_this, replace_with)
+
+            # Only write if content actually changed
+            if new_content != original_content:
+                # Create a temporary file in the same directory for atomic replace
+                with tempfile.NamedTemporaryFile(mode='w', encoding='utf-8',
+                                                 dir=item_path.parent, delete=False) as tf:
+                    temp_file_path = tf.name
+                    tf.write(new_content)
+
+                # Preserve original file's metadata (permissions, etc.)
+                shutil.copystat(item_path, temp_file_path)
+                # Atomically replace the original file
+                os.replace(temp_file_path, item_path)
+                print(f"  Replaced in: {item_path_str}")
+                replaced_count += 1
+            # else: # Optional: uncomment to see skipped files
+            #     print(f"  Skipped (no change): {item_path_str}")
+
+        except FileNotFoundError:
+            print(f"  Error: File not found (might have changed): {item_path_str}", file=sys.stderr)
+            error_count += 1
+        except PermissionError:
+             print(f"  Error: Permission denied for file: {item_path_str}", file=sys.stderr)
+             error_count += 1
+        except UnicodeDecodeError:
+            print(f"  Error: Could not decode file as UTF-8: {item_path_str}", file=sys.stderr)
+            error_count += 1
+        except Exception as e:
+            print(f"  Error processing file {item_path_str}: {e}", file=sys.stderr)
+            error_count += 1
+        finally:
+            # Clean up temp file if something went wrong after creation but before replace
+            if temp_file_path and os.path.exists(temp_file_path):
+                try:
+                    os.remove(temp_file_path)
+                except OSError:
+                    pass # Ignore cleanup error if replace already happened
+
+    # --- Summary ---
+    print("\nReplacement finished.")
+    print(f"  Files processed: {processed_count}")
+    print(f"  Files modified: {replaced_count}")
+    if error_count > 0:
+        print(f"  Errors occurred: {error_count}", file=sys.stderr)
+        sys.exit(1) # Exit with error if any issues occurred
+
+    sys.exit(0)
+
+if __name__ == "__main__":
+    main()
