@@ -20,6 +20,9 @@ sudo apt update -y
 sudo apt upgrade -y
 sudo apt install -y curl git unzip
 
+# Create needed directories
+mkdir -p ~/.local/bin
+
 # Desktop software and tweaks will only be installed if we're running Gnome or Cosmic
 if [[ "$XDG_CURRENT_DESKTOP" == *"GNOME"* || "$XDG_CURRENT_DESKTOP" == *"COSMIC"* ]]; then
   # Store initial values for idle and lock settings
