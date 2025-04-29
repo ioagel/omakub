@@ -16,9 +16,9 @@ source ~/.local/share/omakub/install/terminal/required/app-gum.sh >/dev/null
 source ~/.local/share/omakub/install/first-run-choices.sh
 
 # Needed for all installers
-sudo apt update -y
-sudo apt upgrade -y
-sudo apt install -y curl git unzip
+sudo apt-get update -y
+sudo apt-get upgrade -y
+sudo apt-get install -y curl git unzip
 
 # Create needed directories
 mkdir -p ~/.local/bin
