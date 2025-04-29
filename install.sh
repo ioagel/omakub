@@ -15,6 +15,11 @@ echo "Get ready to make a few choices..."
 source ~/.local/share/omakub/install/terminal/required/app-gum.sh >/dev/null
 source ~/.local/share/omakub/install/first-run-choices.sh
 
+# Needed for all installers
+sudo apt update -y
+sudo apt upgrade -y
+sudo apt install -y curl git unzip
+
 # Desktop software and tweaks will only be installed if we're running Gnome or Cosmic
 if [[ "$XDG_CURRENT_DESKTOP" == *"GNOME"* || "$XDG_CURRENT_DESKTOP" == *"COSMIC"* ]]; then
   # Store initial values for idle and lock settings
